@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Slider thumb — not expressible via Tailwind utilities */
+/* Slider geometry — not expressible via Tailwind utilities */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -15,20 +15,19 @@ input[type="range"]:disabled {
   cursor: not-allowed;
 }
 
-.thumb-blue::-webkit-slider-thumb {
+input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #3b82f6;
   cursor: pointer;
 }
 
+/* Per-slider thumb colour (geometry inherited from the base rule above) */
+.thumb-blue::-webkit-slider-thumb {
+  background: #3b82f6;
+}
+
 .thumb-yellow::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
   background: #eab308;
-  cursor: pointer;
 }

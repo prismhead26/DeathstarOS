@@ -1,45 +1,26 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { getBrightness, setBrightness } from '../api/commands';
+  import { createControl } from '../composables/useControl.svelte';
   import ControlCard from './ControlCard.svelte';
 
-  let brightness = $state(50);
-  let loading = $state(false);
-  let error: string | null = $state(null);
+  // No poll: brightness only changes via this slider or hardware keys.
+  const ctrl = createControl<number>(50, getBrightness);
 
-  async function load(showLoading = false) {
-    try {
-      if (showLoading) loading = true;
-      error = null;
-      brightness = await getBrightness();
-    } catch (e) {
-      error = String(e);
-    } finally {
-      if (showLoading) loading = false;
-    }
-  }
-
-  async function setLevel(e: Event) {
+  const setLevel = (e: Event) => {
     const level = parseFloat((e.target as HTMLInputElement).value);
-    try {
-      error = null;
-      await setBrightness(level);
-      brightness = level;
-    } catch (e) {
-      error = String(e);
-    }
-  }
-
-  onMount(() => load(true));
+    ctrl.data = level; // optimistic
+    ctrl.runQuiet(() => setBrightness(level));
+  };
 </script>
 
-<ControlCard title="Display Brightness" {loading} {error}>
+<ControlCard title="Display Brightness" loading={ctrl.loading} error={ctrl.error}>
   <div class="flex flex-col gap-2">
-    <span class="text-zinc-300 text-sm">Brightness: {Math.round(brightness)}%</span>
+    <span class="text-zinc-300 text-sm">Brightness: {Math.round(ctrl.data)}%</span>
     <input
-      type="range" min="0" max="100" value={brightness}
+      type="range" min="0" max="100" value={ctrl.data}
       oninput={setLevel}
-      disabled={loading}
+      disabled={ctrl.loading}
+      aria-label="Display brightness"
       class="thumb-yellow bg-zinc-700"
     />
   </div>
