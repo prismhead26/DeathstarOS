@@ -1,3 +1,4 @@
+#[cfg(not(target_os = "macos"))]
 use std::process::Command;
 
 #[cfg(target_os = "macos")]
@@ -94,13 +95,4 @@ pub fn set_brightness(level: f32) -> Result<(), String> {
             Err(_) => Err("Brightness tool not available".to_string()),
         }
     }
-}
-
-#[tauri::command]
-pub fn open_accessibility_settings() -> Result<(), String> {
-    Command::new("open")
-        .arg("x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")
-        .output()
-        .map_err(|e| format!("Failed to open settings: {}", e))?;
-    Ok(())
 }

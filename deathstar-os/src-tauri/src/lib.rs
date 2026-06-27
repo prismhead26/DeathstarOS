@@ -3,7 +3,6 @@ mod commands;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             // Audio commands
             commands::toggle_audio_mute,
@@ -18,7 +17,6 @@ pub fn run() {
             // Camera commands
             commands::get_camera_status,
             commands::is_camera_in_use,
-            commands::get_camera_app,
             commands::toggle_camera,
             commands::get_camera_state,
             commands::open_camera_settings,
@@ -31,7 +29,6 @@ pub fn run() {
             // Brightness commands
             commands::get_brightness,
             commands::set_brightness,
-            commands::open_accessibility_settings,
             // Focus/DND commands
             commands::toggle_do_not_disturb,
             commands::get_do_not_disturb_state,

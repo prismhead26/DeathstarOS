@@ -1,48 +1,21 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { toggleDoNotDisturb, getDoNotDisturbState, openFocusSettings } from '../api/commands';
+  import { createControl } from '../composables/useControl.svelte';
   import ControlCard from './ControlCard.svelte';
   import ToggleBtn from './ToggleBtn.svelte';
 
-  let enabled = $state(false);
-  let loading = $state(false);
-  let error: string | null = $state(null);
+  const ctrl = createControl<boolean>(false, getDoNotDisturbState, { pollMs: 5000 });
 
-  async function load(showLoading = false) {
-    try {
-      if (showLoading) loading = true;
-      error = null;
-      enabled = await getDoNotDisturbState();
-    } catch (e) {
-      error = String(e);
-    } finally {
-      if (showLoading) loading = false;
-    }
-  }
-
-  async function toggle() {
-    try {
-      loading = true;
-      error = null;
-      enabled = await toggleDoNotDisturb();
-    } catch (e) {
-      error = String(e);
-    } finally {
-      loading = false;
-    }
-  }
-
-  onMount(() => {
-    load(true);
-    const interval = setInterval(() => load(), 5000);
-    return () => clearInterval(interval);
-  });
+  const toggle = () =>
+    ctrl.run(async () => {
+      ctrl.data = await toggleDoNotDisturb();
+    });
 </script>
 
-<ControlCard title="Do Not Disturb" {loading} {error}>
+<ControlCard title="Do Not Disturb" loading={ctrl.loading} error={ctrl.error}>
   <div class="flex justify-between items-center">
     <span class="text-zinc-300 text-sm">Focus Mode</span>
-    <ToggleBtn active={enabled} disabled={loading} color="purple" onclick={toggle} />
+    <ToggleBtn active={ctrl.data} disabled={ctrl.loading} color="purple" onclick={toggle} />
   </div>
 
   <button

@@ -7,6 +7,32 @@ pub struct NetworkState {
     pub bluetooth_enabled: bool,
 }
 
+/// Discover the Wi-Fi network device (e.g. "en0" or "en1") rather than
+/// assuming en0 — the Wi-Fi interface is not en0 on every Mac.
+fn wifi_interface() -> String {
+    let output = Command::new("networksetup")
+        .arg("-listallhardwareports")
+        .output();
+
+    if let Ok(out) = output {
+        if out.status.success() {
+            let text = String::from_utf8_lossy(&out.stdout);
+            let mut lines = text.lines();
+            while let Some(line) = lines.next() {
+                if line.trim() == "Hardware Port: Wi-Fi" {
+                    for next in lines.by_ref() {
+                        if let Some(dev) = next.trim().strip_prefix("Device:") {
+                            return dev.trim().to_string();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    "en0".to_string() // sensible fallback if discovery fails
+}
+
 #[tauri::command]
 pub fn toggle_wifi() -> Result<bool, String> {
     let current_state = get_wifi_state()?;
@@ -14,7 +40,7 @@ pub fn toggle_wifi() -> Result<bool, String> {
 
     let output = Command::new("networksetup")
         .arg("-setairportpower")
-        .arg("en0")
+        .arg(wifi_interface())
         .arg(new_state)
         .output()
         .map_err(|e| format!("Failed to toggle WiFi: {}", e))?;
@@ -31,7 +57,7 @@ pub fn toggle_wifi() -> Result<bool, String> {
 pub fn get_wifi_state() -> Result<bool, String> {
     let output = Command::new("networksetup")
         .arg("-getairportpower")
-        .arg("en0")
+        .arg(wifi_interface())
         .output()
         .map_err(|e| format!("Failed to get WiFi state: {}", e))?;
 
@@ -40,8 +66,9 @@ pub fn get_wifi_state() -> Result<bool, String> {
         return Err(format!("Failed to get WiFi state: {}", error));
     }
 
+    // Output is e.g. "Wi-Fi Power (en0): On" — match the trailing token.
     let result = String::from_utf8_lossy(&output.stdout);
-    Ok(result.contains("On"))
+    Ok(result.trim().ends_with("On"))
 }
 
 #[tauri::command]

@@ -42,7 +42,7 @@ pub fn is_camera_in_use() -> Result<bool, String> {
     }
 }
 
-#[tauri::command]
+// Internal helper used by get_camera_state; not exposed over IPC.
 pub fn get_camera_app() -> Result<Option<String>, String> {
     // Check which app is using the camera
     let output = Command::new("lsof")
