@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Camera Permission -->
+    <key>NSCameraUsageDescription</key>
+    <string>DeathstarOS needs camera access to monitor camera availability and status.</string>
+
+    <!-- Microphone Permission -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>DeathstarOS needs microphone access to control audio input settings.</string>
+
+    <!-- System Administration -->
+    <key>NSSystemAdministrationUsageDescription</key>
+    <string>DeathstarOS needs system administration access to control brightness, WiFi, and Bluetooth settings.</string>
+
+    <!-- Apple Events (for AppleScript/automation) -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>DeathstarOS needs to send Apple Events to control system settings.</string>
+</dict>
+</plist>
